@@ -1,0 +1,10 @@
+# If you're new to Amazon Web Services, make sure you put in a credit card.
+# If you don't have a credit card set up, you may not be able to deploy
+# your resources and you may run into this error:
+# AWS Access Key Id needs a subscription for the service
+- name: GET dev/
+  endpoin: {function: hello}
+  response:
+    status: 200
+    body:
+      message: Kanban-board!

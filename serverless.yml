@@ -6,10 +6,32 @@ provider:
   name: aws
   runtime: python3.8
 
+plugins:
+  - serverless-offline
+
+# Routing requests for http://localhost:3000/dev.
 functions:
   hello:
-    handler: handler.hello
+    handler: controllers.kanbanBoardController.hello
     events:
       - http:
           path: /
           method: get
+  get:
+    handler: controllers.kanbanBoardController.get
+    events:
+      - http:
+          path: /tasks
+          method: get
+  post:
+    handler: controllers.kanbanBoardController.post
+    events:
+      - http:
+          path: /tasks
+          method: post
+  patch:
+    handler: controllers.kanbanBoardController.patch
+    events:
+      - http:
+          path: /tasks/{id}
+          method: patch
