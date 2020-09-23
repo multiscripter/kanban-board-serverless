@@ -22,5 +22,5 @@ class Task(Base):
     title = Column(String(64), nullable=False)
     start_time = Column(DateTime)
     end_time = Column(DateTime)
-    status = Column(SmallInteger, default=Statuses.TODO)
-    payment = Column(Integer)
+    status = Column(SmallInteger, default=0)
+    payment = Column(Integer, default=0)

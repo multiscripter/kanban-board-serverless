@@ -24,13 +24,13 @@ functions:
           path: /tasks
           method: get
   post:
-    handler: controllers.kanbanBoardController.post
+    handler: controllers.kanbanBoardController.create
     events:
       - http:
           path: /tasks
           method: post
   patch:
-    handler: controllers.kanbanBoardController.patch
+    handler: controllers.kanbanBoardController.update
     events:
       - http:
           path: /tasks/{id}
