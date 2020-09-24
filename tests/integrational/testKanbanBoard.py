@@ -10,18 +10,33 @@ from utils.DBDriver import DBDriver
 class TestKanbanBoard(unittest.TestCase):
     """Test kanbanBoardController."""
 
+    session = None
     URL = 'http://localhost:3000/dev'
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Actions before all tests."""
 
-        execute_sql_script('../../resources/postgresql-schema.sql')
+        TestKanbanBoard.dbms = DBDriver()
+        TestKanbanBoard.session = TestKanbanBoard.dbms.get_session()
+        TestKanbanBoard.execute_sql_script('../../resources/postgresql-schema.sql')
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Actions before each test."""
 
-        execute_sql_script('../../resources/postgresql-test-data.sql')
+        self.session = TestKanbanBoard.session
+        self.execute_sql_script('../../resources/postgresql-test-data.sql')
+
+    def tearDown(self) -> None:
+        """Actions after each test."""
+
+        self.session.execute('truncate tasks')
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        """Actions after all tests."""
+
+        TestKanbanBoard.session.close()
 
     # ---------- Test create task ----------
 
@@ -107,11 +122,8 @@ class TestKanbanBoard(unittest.TestCase):
         """Test: Method GET, URI dev/tasks
         Get all tasks."""
 
-        dbms = DBDriver()
-        session = dbms.get_session()
-        r_proxy = session.execute('select * from tasks')
+        r_proxy = self.session.execute('select * from tasks')
         expected = [{col: val for col, val in row.items()} for row in r_proxy]
-        session.close()
 
         response = requests.get(TestKanbanBoard.URL + '/tasks')
         self.assertEqual(200, response.status_code)
@@ -139,7 +151,7 @@ class TestKanbanBoard(unittest.TestCase):
         """Test: Method PATCH, URI /tasks/id
         Update task. Error: 400. body is not set."""
 
-        first = get_first()
+        first = self.get_first()
         url = f'{TestKanbanBoard.URL}/tasks/{first["id"]}'
         response = requests.patch(url)
         self.assertEqual(400, response.status_code)
@@ -151,7 +163,7 @@ class TestKanbanBoard(unittest.TestCase):
         """Test: Method PATCH, URI /tasks/id
         Update task. Error: 400. body is empty."""
 
-        first = get_first()
+        first = self.get_first()
         url = f'{TestKanbanBoard.URL}/tasks/{first["id"]}'
         response = requests.patch(url, json={})
         self.assertEqual(400, response.status_code)
@@ -166,7 +178,7 @@ class TestKanbanBoard(unittest.TestCase):
         data = {
             'foo': 'bar'
         }
-        first = get_first()
+        first = self.get_first()
         url = f'{TestKanbanBoard.URL}/tasks/{first["id"]}'
         response = requests.patch(url, json=data)
         self.assertEqual(400, response.status_code)
@@ -181,7 +193,7 @@ class TestKanbanBoard(unittest.TestCase):
         data = {
             'status': ''
         }
-        first = get_first()
+        first = self.get_first()
         url = f'{TestKanbanBoard.URL}/tasks/{first["id"]}'
         response = requests.patch(url, json=data)
         self.assertEqual(400, response.status_code)
@@ -196,7 +208,7 @@ class TestKanbanBoard(unittest.TestCase):
         data = {
             'status': 'fake status'
         }
-        first = get_first()
+        first = self.get_first()
         url = f'{TestKanbanBoard.URL}/tasks/{first["id"]}'
         response = requests.patch(url, json=data)
         self.assertEqual(400, response.status_code)
@@ -211,7 +223,7 @@ class TestKanbanBoard(unittest.TestCase):
         data = {
             'status': Task.Statuses.TODO.value
         }
-        first = get_first()
+        first = self.get_first()
         url = f'{TestKanbanBoard.URL}/tasks/{first["id"]}'
         response = requests.patch(url, json=data)
         self.assertEqual(400, response.status_code)
@@ -226,7 +238,7 @@ class TestKanbanBoard(unittest.TestCase):
         data = {
             'status': Task.Statuses.IN_PROGRESS.value
         }
-        first = get_first()
+        first = self.get_first()
         url = f'{TestKanbanBoard.URL}/tasks/{first["id"]}'
         response = requests.patch(url, json=data)
         self.assertEqual(205, response.status_code)
@@ -247,7 +259,7 @@ class TestKanbanBoard(unittest.TestCase):
         data = {
             'status': Task.Statuses.IN_PROGRESS.value
         }
-        first = get_first()
+        first = self.get_first()
         url = f'{TestKanbanBoard.URL}/tasks/{first["id"]}'
         response = requests.patch(url, json=data)
         self.assertEqual(205, response.status_code)
@@ -264,9 +276,7 @@ class TestKanbanBoard(unittest.TestCase):
         """Test: Method PATCH, URI /tasks/id
         Update task. Set status = DONE."""
 
-        dbms = DBDriver()
-        session = dbms.get_session()
-        first = session.query(Task).first()
+        first = self.session.query(Task).first()
 
         url = f'{TestKanbanBoard.URL}/tasks/{first.id}'
 
@@ -277,9 +287,8 @@ class TestKanbanBoard(unittest.TestCase):
             hour=14, minute=0, second=0, microsecond=0
         )
         first.start_time = start_dt
-        session.add(first)
-        session.commit()
-        session.close()
+        self.session.add(first)
+        self.session.commit()
 
         data = {
             'status': Task.Statuses.DONE.value
@@ -312,31 +321,24 @@ class TestKanbanBoard(unittest.TestCase):
         payment = hours * KanbanBoardService.COST_PER_HOUR
         self.assertEqual(262.5, payment)
 
+    @classmethod
+    def execute_sql_script(cls, path=''):
+        with open(path) as sql:
+            data = sql.read()
+            data = data.split(';')
+            session = TestKanbanBoard.session
+            try:
+                for line in data:
+                    line = line.strip()
+                    if line:
+                        session.execute(line.strip())
+                session.commit()
+            except Exception as ex:
+                session.rollback()
+                print(ex)
 
-def execute_sql_script(path=''):
-    with open(path) as sql:
-        data = sql.read()
-        data = data.split(';')
-        dbms = DBDriver()
-        session = dbms.get_session()
-        try:
-            for line in data:
-                line = line.strip()
-                if line:
-                    session.execute(line.strip())
-            session.commit()
-        except Exception as ex:
-            session.rollback()
-            print(ex)
-        finally:
-            session.close()
-
-
-def get_first():
-    service = KanbanBoardService()
-    dbms = DBDriver()
-    session = dbms.get_session()
-    first = session.query(Task).first()
-    first = service.map_to_json(first)
-    session.close()
-    return first
+    def get_first(self):
+        service = KanbanBoardService()
+        first = self.session.query(Task).first()
+        first = service.map_to_json(first)
+        return first
