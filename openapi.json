@@ -1,0 +1,120 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Kanban board on Serverless framework",
+    "description": "api doc generated using https://github.com/Ajaxy/tinyspec"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Site home page",
+        "description": "Site home page",
+        "operationId": "GET",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "tags": [
+          "Endpoints"
+        ]
+      }
+    },
+    "/tasks": {
+      "get": {
+        "summary": "List tasks",
+        "description": "List tasks",
+        "operationId": "GET--tasks",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "tasks": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Task"
+                  }
+                }
+              },
+              "required": [
+                "tasks"
+              ]
+            }
+          }
+        },
+        "tags": [
+          "Endpoints"
+        ]
+      },
+      "post": {
+        "summary": "Create new task",
+        "description": "Create new task",
+        "operationId": "POST--tasks",
+        "responses": {
+          "201": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "task": {
+                  "$ref": "#/definitions/Task"
+                }
+              },
+              "required": [
+                "task"
+              ]
+            }
+          }
+        },
+        "tags": [
+          "Endpoints"
+        ]
+      }
+    },
+    "/tasks/{id}": {
+      "patch": {
+        "summary": "Update task",
+        "description": "Update task",
+        "operationId": "PATCH--tasks--id",
+        "responses": {
+          "205": {
+            "description": "",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "task": {
+                  "$ref": "#/definitions/Task"
+                }
+              },
+              "required": [
+                "task"
+              ]
+            }
+          }
+        },
+        "tags": [
+          "Endpoints"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "type": "string",
+            "in": "path",
+            "required": true
+          }
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Endpoints"
+    }
+  ],
+  "definitions": {}
+}

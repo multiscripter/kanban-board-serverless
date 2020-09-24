@@ -23,3 +23,5 @@ __pycache__/
 .idea
 node_modules
 *.log
+/package.json
+/package-lock.json

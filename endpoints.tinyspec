@@ -1,0 +1,16 @@
+Endpoints:
+    // Site home page
+    GET /
+        => 200
+
+    // List tasks
+    GET /tasks
+        => 200 {tasks: Task[]}
+
+    // Create new task
+    POST /tasks
+        => 201 {task: Task}
+
+    // Update task
+    PATCH /tasks/:id
+        => 205 {task: Task}

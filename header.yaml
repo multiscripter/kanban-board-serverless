@@ -1,0 +1,4 @@
+swagger: '2.0'
+info:
+  title: Kanban board on Serverless framework
+  description: api doc generated using https://github.com/Ajaxy/tinyspec
