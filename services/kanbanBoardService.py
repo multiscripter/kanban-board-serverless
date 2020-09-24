@@ -18,11 +18,7 @@ class KanbanBoardService:
             'data': {},
             'status': 201  # Created.
         }
-        if 'body' not in event:
-            result['data'] = {'error': 'no body'}
-            result['status'] = 400  # Bad Request.
-            is_valid = False
-        if is_valid and '' == event['body']:
+        if event['body'] is None:
             result['data'] = {'error': 'body is not set'}
             result['status'] = 400  # Bad Request.
             is_valid = False
@@ -95,7 +91,7 @@ class KanbanBoardService:
             result['data'] = {'error': 'no body'}
             result['status'] = 400  # Bad Request.
             is_valid = False
-        if is_valid and '' == event['body']:
+        if is_valid and event['body'] is None:
             result['data'] = {'error': 'body is not set'}
             result['status'] = 400  # Bad Request.
             is_valid = False
@@ -121,7 +117,7 @@ class KanbanBoardService:
                 Task.Statuses.DONE.value
             ]
             if body['status'] not in update:
-                result['data'] = {'error': 'unknown status'}
+                result['data'] = {'error': 'status is unknown'}
                 result['status'] = 400  # Bad Request.
                 is_valid = False
         if is_valid:
@@ -133,7 +129,7 @@ class KanbanBoardService:
                     result['status'] = 400  # Bad Request.
                     is_valid = False
                 elif body['status'] - 1 != task.status:
-                    result['data'] = {'error': 'incorrect status'}
+                    result['data'] = {'error': 'status is incorrect'}
                     result['status'] = 409  # Conflict.
                     is_valid = False
                 if is_valid:

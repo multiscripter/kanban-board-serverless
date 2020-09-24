@@ -1,6 +1,6 @@
 from sqlalchemy import Column
 from sqlalchemy import DateTime
-from sqlalchemy import Integer
+from sqlalchemy import Float
 from sqlalchemy import SmallInteger
 from sqlalchemy import String
 from sqlalchemy.ext.declarative import declarative_base
@@ -23,4 +23,4 @@ class Task(Base):
     start_time = Column(DateTime)
     end_time = Column(DateTime)
     status = Column(SmallInteger, default=0)
-    payment = Column(Integer, default=0)
+    payment = Column(Float, default=0)
