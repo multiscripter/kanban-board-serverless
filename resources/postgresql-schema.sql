@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS tasks (
+CREATE TABLE tasks (
     id smallserial NOT NULL PRIMARY KEY,
     title character varying(64) NOT NULL,
     start_time timestamp with time zone,

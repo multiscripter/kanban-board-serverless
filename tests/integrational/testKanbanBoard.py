@@ -10,6 +10,7 @@ from utils.DBDriver import DBDriver
 class TestKanbanBoard(unittest.TestCase):
     """Test kanbanBoardController."""
 
+    backup = None
     session = None
     URL = 'http://localhost:3000/dev'
 
@@ -18,7 +19,12 @@ class TestKanbanBoard(unittest.TestCase):
         """Actions before all tests."""
 
         TestKanbanBoard.dbms = DBDriver()
-        TestKanbanBoard.session = TestKanbanBoard.dbms.get_session()
+        session = TestKanbanBoard.dbms.get_session()
+        TestKanbanBoard.session = session
+        r_proxy = session.execute('select * from tasks')
+        backup = [{col: val for col, val in row.items()} for row in r_proxy]
+        TestKanbanBoard.backup = backup
+        session.execute('drop table tasks')
         TestKanbanBoard.execute_sql_script('../../resources/postgresql-schema.sql')
 
     def setUp(self) -> None:
@@ -36,7 +42,20 @@ class TestKanbanBoard(unittest.TestCase):
     def tearDownClass(cls) -> None:
         """Actions after all tests."""
 
-        TestKanbanBoard.session.close()
+        session = TestKanbanBoard.session
+        session.execute('drop table tasks')
+        TestKanbanBoard.execute_sql_script('../../resources/postgresql-schema.sql')
+        for item in TestKanbanBoard.backup:
+            task = Task()
+            task.id = item['id']
+            task.title = item['title']
+            task.start_time = item['start_time']
+            task.end_time = item['end_time']
+            task.status = item['status']
+            task.payment = item['payment']
+            session.add(task)
+        session.commit()
+        session.close()
 
     # ---------- Test create task ----------
 
