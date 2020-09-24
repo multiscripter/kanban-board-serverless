@@ -1,8 +1,8 @@
 from datetime import datetime
-import json
 from models.task import Task
 import pytz
 from utils.DBDriver import DBDriver
+from utils.validator import Validator
 
 
 class KanbanBoardService:
@@ -10,36 +10,19 @@ class KanbanBoardService:
 
     def __init__(self):
         self.dbms = DBDriver()
+        self.validator = Validator()
 
     def create_task(self, event):
-        body = dict()
-        is_valid = True
         result = {
             'data': {},
             'status': 201  # Created.
         }
-        if event['body'] is None:
-            result['data'] = {'error': 'body is not set'}
-            result['status'] = 400  # Bad Request.
-            is_valid = False
-        if is_valid:
-            body = json.loads(event['body'])
-            if not bool(body):
-                result['data'] = {'error': 'body is empty'}
-                result['status'] = 400  # Bad Request.
-                is_valid = False
-        if is_valid:
-            if 'title' not in body:
-                result['data'] = {'error': 'title is not set'}
-                result['status'] = 400  # Bad Request.
-                is_valid = False
-            else:
-                body['title'] = body['title'].strip()
-        if is_valid and not body['title']:
-            result['data'] = {'error': 'title is empty'}
-            result['status'] = 400  # Bad Request.
-            is_valid = False
-        if is_valid:
+        fields = {
+            'title': ['is_set', 'is_empty']
+        }
+        errors = self.validator.validate(event, result, fields)
+        if not errors:
+            body = event['body']
             task = Task(title=body['title'])
             session = self.dbms.get_session()
             try:
@@ -51,6 +34,8 @@ class KanbanBoardService:
                 print(ex)
             finally:
                 session.close()
+        else:
+            result['data'] = {'errors': errors}
         return result
 
     def get_tasks(self, event):
@@ -75,64 +60,43 @@ class KanbanBoardService:
 
     def update_task(self, event):
         body = dict()
-        is_valid = True
+        errors = dict()
         result = {
             'data': {},
             'status': 205  # Reset Content.
+        }
+        fields = {
+            'status': ['is_set', 'is_empty']
         }
         id = event['pathParameters']['id']
         if id.isdigit():
             id = int(id)
         else:
-            result['data'] = {'error': 'incorrect path'}
+            errors['common'] = 'incorrect path'
             result['status'] = 404  # Not Found.
-            is_valid = False
-        if is_valid and 'body' not in event:
-            result['data'] = {'error': 'no body'}
-            result['status'] = 400  # Bad Request.
-            is_valid = False
-        if is_valid and event['body'] is None:
-            result['data'] = {'error': 'body is not set'}
-            result['status'] = 400  # Bad Request.
-            is_valid = False
-        if is_valid:
-            body = json.loads(event['body'])
-            if not bool(body):
-                result['data'] = {'error': 'body is empty'}
-                result['status'] = 400  # Bad Request.
-                is_valid = False
-        if is_valid:
-            if 'status' not in body:
-                result['data'] = {'error': 'status is not set'}
-                result['status'] = 400  # Bad Request.
-                is_valid = False
-        if is_valid and '' == body['status']:
-            result['data'] = {'error': 'status is empty'}
-            result['status'] = 400  # Bad Request.
-            is_valid = False
-        if is_valid:
+        if not errors:
+            errors = self.validator.validate(event, result, fields)
+        if not errors:
+            body = event['body']
             update = [
                 Task.Statuses.TODO.value,
                 Task.Statuses.IN_PROGRESS.value,
                 Task.Statuses.DONE.value
             ]
             if body['status'] not in update:
-                result['data'] = {'error': 'status is unknown'}
+                errors['status'] = 'status is unknown'
                 result['status'] = 400  # Bad Request.
-                is_valid = False
-        if is_valid:
+        if not errors:
             session = self.dbms.get_session()
             try:
                 task = session.query(Task).get(id)
                 if body['status'] == task.status:
-                    result['data'] = {'error': 'status is not changed'}
+                    errors['status'] = 'status is not changed'
                     result['status'] = 400  # Bad Request.
-                    is_valid = False
                 elif body['status'] - 1 != task.status:
-                    result['data'] = {'error': 'status is incorrect'}
+                    errors['status'] = 'status is incorrect'
                     result['status'] = 409  # Conflict.
-                    is_valid = False
-                if is_valid:
+                if not errors:
                     task.status = body['status']
                     if task.status == task.Statuses.IN_PROGRESS.value:
                         task.start_time = datetime.now(tz=pytz.UTC)
@@ -150,6 +114,8 @@ class KanbanBoardService:
                 print(ex)
             finally:
                 session.close()
+        if errors:
+            result['data'] = {'errors': errors}
         return result
 
     def map_to_json(self, task):

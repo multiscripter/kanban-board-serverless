@@ -67,7 +67,7 @@ class TestKanbanBoard(unittest.TestCase):
         self.assertEqual(400, response.status_code)
 
         actual = response.json()
-        self.assertEqual('body is not set', actual['error'])
+        self.assertEqual('body is not set', actual['errors']['body'])
 
     def test_create_task_error_body_is_empty(self):
         """Test: Method POST, URI /tasks/
@@ -77,7 +77,7 @@ class TestKanbanBoard(unittest.TestCase):
         self.assertEqual(400, response.status_code)
 
         actual = response.json()
-        self.assertEqual('body is empty', actual['error'])
+        self.assertEqual('body is empty', actual['errors']['body'])
 
     def test_create_task_error_body_title_is_not_set(self):
         """Test: Method POST, URI /tasks/
@@ -90,7 +90,7 @@ class TestKanbanBoard(unittest.TestCase):
         self.assertEqual(400, response.status_code)
 
         actual = response.json()
-        self.assertEqual('title is not set', actual['error'])
+        self.assertEqual('title is not set', actual['errors']['title'])
 
     def test_create_task_error_title_is_empty(self):
         """Test: Method POST, URI /tasks/
@@ -103,7 +103,7 @@ class TestKanbanBoard(unittest.TestCase):
         self.assertEqual(400, response.status_code)
 
         actual = response.json()
-        self.assertEqual('title is empty', actual['error'])
+        self.assertEqual('title is empty', actual['errors']['title'])
 
     def test_create_task(self):
         """Test: Method POST, URI /tasks/
@@ -164,7 +164,7 @@ class TestKanbanBoard(unittest.TestCase):
         self.assertEqual(404, response.status_code)
 
         actual = response.json()
-        self.assertEqual('incorrect path', actual['error'])
+        self.assertEqual('incorrect path', actual['errors']['common'])
 
     def test_update_task_error_body_is_not_set(self):
         """Test: Method PATCH, URI /tasks/id
@@ -176,7 +176,7 @@ class TestKanbanBoard(unittest.TestCase):
         self.assertEqual(400, response.status_code)
 
         actual = response.json()
-        self.assertEqual('body is not set', actual['error'])
+        self.assertEqual('body is not set', actual['errors']['body'])
 
     def test_update_task_error_body_is_empty(self):
         """Test: Method PATCH, URI /tasks/id
@@ -188,7 +188,7 @@ class TestKanbanBoard(unittest.TestCase):
         self.assertEqual(400, response.status_code)
 
         actual = response.json()
-        self.assertEqual('body is empty', actual['error'])
+        self.assertEqual('body is empty', actual['errors']['body'])
 
     def test_update_task_error_status_is_not_set(self):
         """Test: Method PATCH, URI /tasks/id
@@ -203,7 +203,7 @@ class TestKanbanBoard(unittest.TestCase):
         self.assertEqual(400, response.status_code)
 
         actual = response.json()
-        self.assertEqual('status is not set', actual['error'])
+        self.assertEqual('status is not set', actual['errors']['status'])
 
     def test_update_task_error_status_is_empty(self):
         """Test: Method PATCH, URI /tasks/id
@@ -218,7 +218,7 @@ class TestKanbanBoard(unittest.TestCase):
         self.assertEqual(400, response.status_code)
 
         actual = response.json()
-        self.assertEqual('status is empty', actual['error'])
+        self.assertEqual('status is empty', actual['errors']['status'])
 
     def test_update_task_error_status_is_unknown(self):
         """Test: Method PATCH, URI /tasks/id
@@ -233,7 +233,7 @@ class TestKanbanBoard(unittest.TestCase):
         self.assertEqual(400, response.status_code)
 
         actual = response.json()
-        self.assertEqual('status is unknown', actual['error'])
+        self.assertEqual('status is unknown', actual['errors']['status'])
 
     def test_update_task_error_status_is_not_changed(self):
         """Test: Method PATCH, URI /tasks/id
@@ -248,7 +248,7 @@ class TestKanbanBoard(unittest.TestCase):
         self.assertEqual(400, response.status_code)
 
         actual = response.json()
-        self.assertEqual('status is not changed', actual['error'])
+        self.assertEqual('status is not changed', actual['errors']['status'])
 
     def test_update_task_error_status_is_incorrect(self):
         """Test: Method PATCH, URI /tasks/id
@@ -269,7 +269,7 @@ class TestKanbanBoard(unittest.TestCase):
         self.assertEqual(409, response.status_code)
 
         actual = response.json()
-        self.assertEqual('status is incorrect', actual['error'])
+        self.assertEqual('status is incorrect', actual['errors']['status'])
 
     def test_update_task_status_in_progress(self):
         """Test: Method PATCH, URI /tasks/id
