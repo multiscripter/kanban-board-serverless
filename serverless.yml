@@ -6,8 +6,8 @@ provider:
   name: aws
   runtime: python3.8
 
-plugins:
-  - serverless-offline
+#plugins:
+#  - serverless-offline
 
 # Routing requests for http://localhost:3000/dev.
 functions:
