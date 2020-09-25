@@ -16,6 +16,13 @@ class DBDriver:
             + 'database-1.c1wirqdqpjjf.eu-central-1.rds.amazonaws.com:5432/kanbanboardsls',
             client_encoding='utf8'
         )
+        # self.dbms = create_engine(
+        #     'postgresql+pg8000://'
+        #     + 'postgres:postgresrootpass'
+        #     + '@'
+        #     + 'localhost:5432/kanban_board_sls',
+        #     client_encoding='utf8'
+        # )
 
     def get_dbms(self):
         if not self.dbms:

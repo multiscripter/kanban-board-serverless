@@ -12,25 +12,25 @@ plugins:
 # Routing requests for http://localhost:3000/dev.
 functions:
   hello:
-    handler: controllers.kanbanBoardController.hello
+    handler: kanbanBoardController.hello
     events:
       - http:
           path: /
           method: get
   get:
-    handler: controllers.kanbanBoardController.get
+    handler: kanbanBoardController.get
     events:
       - http:
           path: /tasks
           method: get
   post:
-    handler: controllers.kanbanBoardController.create
+    handler: kanbanBoardController.create
     events:
       - http:
           path: /tasks
           method: post
   patch:
-    handler: controllers.kanbanBoardController.update
+    handler: kanbanBoardController.update
     events:
       - http:
           path: /tasks/{id}
