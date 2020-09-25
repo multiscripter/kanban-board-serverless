@@ -13,7 +13,7 @@ class DBDriver:
             'postgresql+pg8000://'
             + 'postgres:postgresrootpass'
             + '@'
-            + 'localhost:5432/kanban_board_sls',
+            + 'database-1.c1wirqdqpjjf.eu-central-1.rds.amazonaws.com:5432/kanbanboardsls',
             client_encoding='utf8'
         )
 
