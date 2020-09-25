@@ -5,6 +5,12 @@ service: kanban-board-serverless
 provider:
   name: aws
   runtime: python3.8
+  environment:
+    host: database-1.c1wirqdqpjjf.eu-central-1.rds.amazonaws.com
+    dbname: kanbanboardsls
+    user: postgres
+    pass: postgresrootpass
+    port: 5432
 
 #plugins:
 #  - serverless-offline

@@ -1,3 +1,4 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -9,20 +10,22 @@ class DBDriver:
         self.dbms = False
 
     def _create_engine(self):
-        self.dbms = create_engine(
-            'postgresql+pg8000://'
-            + 'postgres:postgresrootpass'
-            + '@'
-            + 'database-1.c1wirqdqpjjf.eu-central-1.rds.amazonaws.com:5432/kanbanboardsls',
-            client_encoding='utf8'
-        )
-        # self.dbms = create_engine(
-        #     'postgresql+pg8000://'
-        #     + 'postgres:postgresrootpass'
-        #     + '@'
-        #     + 'localhost:5432/kanban_board_sls',
-        #     client_encoding='utf8'
-        # )
+        if 'USER' in os.environ:
+            user = 'postgres'
+            passwd = 'postgresrootpass'
+            host = 'localhost'
+            port = '5432'
+            dbname = 'kanban_board_sls'
+        else:
+            user = os.environ['user']
+            passwd = os.environ['pass']
+            host = os.environ['host']
+            port = str(os.environ['port'])
+            dbname = os.environ['dbname']
+
+        fuel = 'postgresql+pg8000://' + user + ':' + passwd + '@'
+        fuel += host + ':' + port + '/' + dbname
+        self.dbms = create_engine(fuel, client_encoding='utf8')
 
     def get_dbms(self):
         if not self.dbms:
