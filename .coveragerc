@@ -1,0 +1,8 @@
+[run]
+include =
+    ./models/*
+    ./services/*
+    ./utils/*
+    ./kanbanBoardController.py
+omit =
+    */__init__.py

@@ -5,6 +5,14 @@ import requests
 from services.kanbanBoardService import KanbanBoardService
 import unittest
 from utils.DBDriver import DBDriver
+import os
+
+# Запуск тестов из корня проекта с генерацией покрытия кода.
+# coverage erase
+# coverage run -m pytest -p no:cacheprovider ./tests/integrational/testKanbanBoard.py
+# coverage html
+
+# coverage не покрывает файлы в корне проекта (kanbanBoardController.py)
 
 
 class TestKanbanBoard(unittest.TestCase):
@@ -13,10 +21,15 @@ class TestKanbanBoard(unittest.TestCase):
     backup = None
     session = None
     URL = 'http://localhost:3000/dev'
+    path = ''
 
     @classmethod
     def setUpClass(cls) -> None:
         """Actions before all tests."""
+
+        path = os.environ['PWD'].split('/tests')
+        TestKanbanBoard.path = path[0] if path else os.environ['PWD']
+        path = TestKanbanBoard.path + '/resources/postgresql-schema.sql'
 
         TestKanbanBoard.dbms = DBDriver()
         session = TestKanbanBoard.dbms.get_session()
@@ -25,13 +38,14 @@ class TestKanbanBoard(unittest.TestCase):
         backup = [{col: val for col, val in row.items()} for row in r_proxy]
         TestKanbanBoard.backup = backup
         session.execute('drop table tasks')
-        TestKanbanBoard.execute_sql_script('../../resources/postgresql-schema.sql')
+        TestKanbanBoard.execute_sql_script(path)
 
     def setUp(self) -> None:
         """Actions before each test."""
 
+        path = TestKanbanBoard.path + '/resources/postgresql-test-data.sql'
         self.session = TestKanbanBoard.session
-        self.execute_sql_script('../../resources/postgresql-test-data.sql')
+        self.execute_sql_script(path)
 
     def tearDown(self) -> None:
         """Actions after each test."""
@@ -42,9 +56,10 @@ class TestKanbanBoard(unittest.TestCase):
     def tearDownClass(cls) -> None:
         """Actions after all tests."""
 
+        path = TestKanbanBoard.path + '/resources/postgresql-schema.sql'
         session = TestKanbanBoard.session
         session.execute('drop table tasks')
-        TestKanbanBoard.execute_sql_script('../../resources/postgresql-schema.sql')
+        TestKanbanBoard.execute_sql_script(path)
         for item in TestKanbanBoard.backup:
             task = Task()
             task.id = item['id']
