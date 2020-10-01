@@ -9,7 +9,7 @@ import os
 
 # Запуск тестов из корня проекта с генерацией покрытия кода.
 # coverage erase
-# coverage run -m pytest -p no:cacheprovider ./tests/integrational/testKanbanBoard.py
+# coverage run -m pytest -p no:cacheprovider ./tests/*.py
 # coverage html
 
 # coverage не покрывает файлы в корне проекта (kanbanBoardController.py)

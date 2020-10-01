@@ -31,6 +31,12 @@ class KanbanBoardService:
                 result['data'] = self.map_to_json(task)
             except Exception as ex:
                 session.rollback()
+                result['status'] = 500
+                result['data'] = {
+                    'errors': {
+                        'db': 'session.commit error'
+                    }
+                }
                 print(ex)
             finally:
                 session.close()
@@ -53,6 +59,12 @@ class KanbanBoardService:
                     objects.append(obj)
             result['data'] = objects
         except Exception as ex:
+            result['status'] = 500
+            result['data'] = {
+                'errors': {
+                    'db': 'session.query.all error'
+                }
+            }
             print(ex)
         finally:
             session.close()
@@ -111,6 +123,12 @@ class KanbanBoardService:
                     result['data'] = self.map_to_json(task)
             except Exception as ex:
                 session.rollback()
+                result['status'] = 500
+                result['data'] = {
+                    'errors': {
+                        'db': 'session.commit error'
+                    }
+                }
                 print(ex)
             finally:
                 session.close()
