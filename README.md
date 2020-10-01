@@ -54,35 +54,55 @@ Content-Type: application/json
 
 2 - done
 
-### Setup
+### Настроийка
 
-Run this command to initialize a new project in a new working directory.
+Запустите эту команду, чтобы инициализировать новый проект в новом рабочем каталоге.
 
 `sls init aws-python-rest-api`
 
-### Usage
+### Использование
 
-**Deploy**
+**Развертывание**
 
-This example is made to work with the Serverless Framework dashboard which includes advanced features like CI/CD, monitoring, metrics, etc.
+Этот пример предназначен для работы с информационной панелью Serverless Framework, которая включает расширенные функции, такие как CI / CD, мониторинг, метрики и т.д.
 
 ```
 $ serverless login
 $ serverless deploy
 ```
 
-To deploy without the dashboard you will need to remove `org` and `app` fields from the `serverless.yml`, and you won’t have to run `sls login` before deploying.
+Для развертывания без панели инструментов вам нужно будет удалить поля `org` и `app` из `serverless.yml`, и вам не нужно будет запускать `sls login` перед развертыванием.
 
-**Invoke the function locally.**
+**Вызов функции локально.**
 
 ```
 serverless invoke local --function hello
 ```
 
-**Invoke the function**
+**Вызвать функцию**
 
 ```
 curl https://xxxxxxxxx.execute-api.us-east-1.amazonaws.com/dev/
 ```
 
+**Запуск локально**
 
+- В файле serverless.yml закомментировать строки:
+```
+  environment:
+    host: database-1.c1wirqdqpjjf.eu-central-1.rds.amazonaws.com
+    dbname: kanbanboardsls
+    user: postgres
+    pass: postgresrootpass
+    port: 5432
+```
+- В файле serverless.yml раскомментировать строки:
+```
+plugins:
+  - serverless-offline
+```
+
+- В корневой папке проекта выполнить команду:
+```
+serverless offline
+```
