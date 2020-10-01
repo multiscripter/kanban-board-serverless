@@ -116,5 +116,39 @@
       "name": "Endpoints"
     }
   ],
-  "definitions": {}
+  "definitions": {
+    "Task": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "integer"
+        },
+        "payment": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "start_time",
+        "end_time",
+        "status",
+        "payment"
+      ]
+    }
+  }
 }

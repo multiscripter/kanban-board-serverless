@@ -106,3 +106,9 @@ plugins:
 ```
 serverless offline
 ```
+
+**Сгенерировать openapi.json**
+```
+tinyspec -j
+```
+https://www.npmjs.com/package/tinyspec
